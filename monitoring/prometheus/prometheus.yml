@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'gateway-public'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['gateway:8080']
+
+  - job_name: 'gateway-internal'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['gateway:8081']
