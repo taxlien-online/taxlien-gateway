@@ -1,9 +1,11 @@
-# Plan: API Gateway Implementation
+# Plan: API Gateway Implementation (Legacy Python)
 
-**Version:** 1.1 (Unit Test First)
+**Version:** 1.1 (Legacy reference)
 **Status:** PLAN
 **Based on:** Specifications v1.0
-**Last Updated:** 2026-01-18
+**Last Updated:** 2026-02-04
+
+**Примечание:** Целевая реализация — v3.0 Minimal в `sdd-taxlien-gateway` (Go, один порт :8081). Задачи ниже описывают legacy Python-реализацию и возможную миграцию; Phase 5 (Tri-Port) не реализовывать — заменён на v3.0.
 
 ---
 

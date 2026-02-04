@@ -58,19 +58,20 @@
 
 ---
 
-### 2. sdd-taxlien-gateway (ВТОРОЙ)
+### 2. sdd-taxlien-gateway + sdd-taxlien-gateway-supabase (ВТОРОЙ)
 
-**Текущий статус:** IMPLEMENTATION v1.2
+**Текущий статус (2026-02-04):** Endpoints для Miw (foreclosure-candidates, OTC, search, CSV export) реализуются через **Supabase** (sdd-taxlien-gateway-supabase): PostgREST, views (v_foreclosure_candidates, v_otc_liens), RPC (search_liens). Go Gateway (sdd-taxlien-gateway v3.0) отвечает только за Worker API (:8081), не за публичный CRUD/liens.
 
-**Нужно добавить в requirements:**
+**Требования к данным/API (Supabase + ML):**
 
 | Requirement | Description |
 |-------------|-------------|
-| Endpoint: chronic delinquent | Filter by prior_years_owed >= N |
-| Filter: max_amount | Budget filter (e.g., $500) |
-| Include: ML scores | Return SerialPayerDetector score |
+| View/endpoint: foreclosure candidates | prior_years_owed >= N, foreclosure_prob, max_amount |
+| View/endpoint: OTC liens | is_otc, state, county, max_amount |
+| RPC: search_liens | Фильтры + ML scores (miw_score, karma_score, SerialPayerDetector) |
+| Export CSV | На базе search или view (Edge Function или клиент) |
 
-**Обоснование:** API нужен для query данных из базы
+**Обоснование:** API нужен для query данных из базы; реализация — Supabase PostgREST + views/functions.
 
 ---
 

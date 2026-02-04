@@ -1,10 +1,30 @@
 # Requirements: API Gateway - Unified Entry Point
 
-**Version:** 2.0 (Go Rewrite)
-**Status:** REQUIREMENTS PHASE - DRAFTING
-**Last Updated:** 2026-02-01
+**Version:** 2.0 (Go Rewrite) + v3.0 Current Target
+**Status:** REQUIREMENTS
+**Last Updated:** 2026-02-04
 **Goal:** Single entry point for all external clients to access TAXLIEN.online services
-**Tech Stack:** Go 1.22+ (Chi router, pgx, go-redis)
+
+---
+
+## Current target: v3.0 Minimal Worker API
+
+**Реализуем сейчас:** один сервис, один порт, только Internal API для воркеров. Всё остальное — Supabase.
+
+| Аспект | v3.0 (Minimal) |
+|--------|-----------------|
+| **Порты** | Один: **:8081** (internal only) |
+| **Публичный API** | Нет (Supabase PostgREST + RLS) |
+| **Auth** | Нет в Gateway (Supabase Auth) |
+| **Rate limiting** | Нет в Gateway (Supabase / Edge) |
+| **Gateway отвечает за** | Worker API: work, results, tasks, raw-files, heartbeat |
+| **Аутентификация воркеров** | X-Worker-Token |
+| **Прокси** | Не в Gateway (воркеры и tor-socks-proxy сами) |
+| **FR-12 (Miw: liens/foreclosure/OTC/search/export)** | Через Supabase: views + PostgREST (см. sdd-taxlien-gateway-supabase) |
+
+**Стек:** Go 1.22+, Chi, pgx (Supabase DB), go-redis (очередь задач).
+
+Ниже сохранён полный текст v2.0 (Tri-Port, Go) для справки; для реализации v3.0 ориентироваться на этот блок и на 02-specifications (v3.0).
 
 ---
 

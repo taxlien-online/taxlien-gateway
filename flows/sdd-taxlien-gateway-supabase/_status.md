@@ -1,16 +1,16 @@
-# Status: sdd-taxlien-supabase
+# Status: sdd-taxlien-gateway-supabase
 
 ## Current Phase
 
-**REQUIREMENTS** | SPECIFICATIONS | PLAN | IMPLEMENTATION
+REQUIREMENTS ✅ | **SPECIFICATIONS** | PLAN | IMPLEMENTATION
 
 ## Phase Status
 
-DRAFTING
+SPECIFICATIONS DRAFTED — на ревью
 
 ## Last Updated
 
-2026-02-01
+2026-02-04
 
 ## Blockers
 
@@ -18,9 +18,9 @@ DRAFTING
 
 ## Progress
 
-- [x] Requirements drafted
+- [x] Requirements drafted (01-requirements.md)
 - [ ] Requirements approved
-- [ ] Specifications drafted
+- [x] Specifications drafted (02-specifications.md)
 - [ ] Specifications approved
 - [ ] Plan drafted
 - [ ] Plan approved
@@ -29,26 +29,21 @@ DRAFTING
 
 ## Context Notes
 
-**Decision (2026-02-01):** Использовать Supabase как primary backend вместо custom microservices.
+**Decision (2026-02-01):** Supabase как primary backend.
 
 **Supabase заменяет:**
-- `sdd-taxlien-storage` → Supabase Storage
-- `sdd-taxlien-imgproxy` → Supabase Image Transforms
+- Storage → Supabase Storage (+ Image Transforms)
 - Firebase Auth → Supabase Auth
-- Custom CRUD API → PostgREST auto-API
+- Custom CRUD / Liens API → PostgREST (views, RPC)
 
-**Остаётся custom Go service для:**
-- Worker Internal API (task queue)
-- ML predictions proxy (optional)
-- Complex rate limiting (optional)
+**Gateway (sdd-taxlien-gateway v3.0):** только Worker API :8081 (work, results, heartbeat, raw-files, tasks). Подключается к той же Supabase PostgreSQL и к Redis.
 
 **Related SDDs:**
-- `sdd-taxlien-gateway` - упрощённый до Worker API only
-- `sdd-taxlien-ml` - ML service (отдельный)
+- `sdd-taxlien-gateway` — v3.0 Minimal (Worker API)
+- `sdd-miw-gift` — FR-12 (foreclosure/OTC/search/export) через Supabase views + PostgREST
 
 ## Next Actions
 
-1. Review requirements draft
-2. Approve Supabase approach
-3. Define database schema
-4. Define RLS policies
+1. Ревью 02-specifications.md
+2. Утвердить требования и спеки
+3. Написать план (03-plan): порядок деплоя схемы, RLS, Storage, Edge Functions

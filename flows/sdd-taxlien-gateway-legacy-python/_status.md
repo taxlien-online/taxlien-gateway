@@ -1,39 +1,34 @@
-# Status: sdd-taxlien-gateway
+# Status: sdd-taxlien-gateway-legacy-python
+
+## Purpose
+
+**Legacy Python Gateway:** миграция/архивирование кода из `taxlien-gateway/legacy/`. Целевая архитектура — **v3.0 Minimal** (см. `sdd-taxlien-gateway`): один порт :8081, только Worker API; прокси и публичный API не входят в Gateway.
 
 ## Current Phase
 
-REQUIREMENTS | SPECIFICATIONS | PLAN | **IMPLEMENTATION**
+REQUIREMENTS ✅ | SPECIFICATIONS ✅ | PLAN ✅ | **IMPLEMENTATION** (legacy migration)
 
 ## Phase Status
 
-IN PROGRESS
+ON HOLD — целевой продукт: Go v3.0 Minimal (sdd-taxlien-gateway)
 
 ## Last Updated
 
-2026-01-28
+2026-02-04
 
 ## Blockers
 
-- None
+- Нет. Текущий фокус — v3.0 Minimal в основном flow.
 
 ## Progress
 
-- [x] Requirements drafted
-- [x] Requirements approved (v1.0) ✅
-- [x] Requirements update (v1.1 - CI/CD & Dashboards) ✅
-- [x] Requirements update (v1.2 - Dual-Port Architecture) ✅
-- [x] Specifications drafted (v1.0)
-- [x] Specifications update (v1.1 - CI/CD & Dashboards) ✅
-- [x] Specifications update (v1.2 - Dual-Port Architecture) ✅
-- [x] Specifications approved ✅
-- [x] Plan drafted (v1.2 - CI/CD & Dashboards) ✅
-- [x] Plan approved ✅
-- [x] Implementation (v1.1 Complete)
-    - [x] Phase 0-4 Complete ✅
-    - [x] Phase 5: CI/CD Pipeline ✅
-    - [x] Phase 6: Monitoring Dashboards ✅
-- [/] Implementation (v1.2 Dual-Port Architecture)
-    - [ ] Create `app/apps/` structure
-    - [ ] Refactor `main.py` to run two servers
-    - [ ] Update `docker-compose.yml` and `Dockerfile`
-    - [ ] Verify isolation with tests
+- [x] Requirements drafted (v1.0, Tri-Port)
+- [x] Specifications drafted (v1.0); уточнено: proxy не в зоне Gateway (tor-socks-proxy у воркеров)
+- [x] Plan drafted
+- [x] Реализация v1.1 (Python) завершена; код в `legacy/`
+- [ ] Tri-Port (v1.2) не реализовывать — заменён на v3.0 Minimal
+
+## Context Notes
+
+- **tor-socks-proxy:** Gateway не управляет прокси. Воркеры подключаются к tor-socks-proxy сами; в спеках proxy endpoints помечены как удалённые.
+- **Связь с sdd-taxlien-gateway:** основной flow перешёл на v3.0 (Go, один порт). Этот flow описывает существующий Python-код и его возможную миграцию/архивацию.

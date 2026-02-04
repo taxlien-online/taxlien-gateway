@@ -1,13 +1,74 @@
 # Specifications: API Gateway
 
-**Version:** 1.0
+**Version:** 1.0 + v3.0 Minimal
 **Status:** SPECIFICATIONS
-**Last Updated:** 2026-01-18
-**Tech Stack:** FastAPI, Redis, Firebase Admin SDK, Prometheus
+**Last Updated:** 2026-02-04
+**Requirements:** [01-requirements.md](01-requirements.md) (v3.0 target: Minimal Worker API)
 
 ---
 
-## System Architecture - Tri-Port Design
+## v3.0 Minimal Worker API — Target Architecture
+
+**Один сервис, один порт :8081.** Публичный API, Auth, CRUD, Liens (FR-12) — Supabase (см. `sdd-taxlien-gateway-supabase`).
+
+### Scope
+
+| Компонент | В Gateway v3.0 |
+|-----------|------------------|
+| GET /internal/work | ✅ |
+| POST /internal/results | ✅ |
+| POST /internal/tasks/{id}/complete, /fail | ✅ |
+| POST /internal/raw-files | ✅ |
+| POST /internal/heartbeat | ✅ |
+| GET /health | ✅ |
+| Proxy (create/rotate/ban) | ❌ (воркеры + tor-socks-proxy) |
+| Public API (:8080) | ❌ (Supabase) |
+| Party internal (:8082) | ❌ (при необходимости — отдельный контур позже) |
+
+### Tech Stack (v3.0)
+
+- **Runtime:** Go 1.22+
+- **Router:** Chi
+- **DB:** pgx → PostgreSQL (Supabase)
+- **Queue:** go-redis (task queues, processing state)
+- **Auth:** X-Worker-Token (константа/секрет из env)
+
+### Project Layout (v3.0)
+
+```
+taxlien-gateway/
+├── cmd/gateway/main.go           # Один HTTP server :8081
+├── internal/
+│   ├── config/config.go
+│   ├── server/server.go         # Chi, :8081
+│   ├── handler/
+│   │   └── internal/            # work, results, tasks, raw_files, heartbeat
+│   ├── middleware/              # worker_auth, request_id, logging
+│   ├── service/                 # queue, properties (upsert), worker_registry
+│   ├── model/                   # task, parcel, worker
+│   └── pkg/
+│       ├── db/postgres.go
+│       └── cache/redis.go
+├── Dockerfile
+├── docker-compose.yml
+└── go.mod
+```
+
+### Data Flow (v3.0)
+
+```
+Workers (Parser/Party)  ──X-Worker-Token──►  Gateway :8081  ──►  Redis (queue) + PostgreSQL (Supabase)
+                                                                        ▲
+                                                    tor-socks-proxy  ◄──┘  (не в Gateway)
+```
+
+### tor-socks-proxy: не в зоне ответственности Gateway
+
+Воркеры сами знают `TOR_PROXY_HOST`/`TOR_PROXY_PORT` и подключаются к tor-socks-proxy. Gateway не выдаёт и не банит прокси. См. раздел "tor-socks-proxy: NOT Gateway's Responsibility" ниже.
+
+---
+
+## System Architecture - Tri-Port Design (v1.0 / v2.0 reference)
 
 **Key Architectural Decision:** Single service running THREE FastAPI applications on separate ports.
 

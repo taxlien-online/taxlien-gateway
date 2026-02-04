@@ -1,9 +1,11 @@
-# Requirements: API Gateway - Unified Entry Point
+# Requirements: API Gateway - Unified Entry Point (Legacy Python)
 
-**Version:** 1.0
-**Status:** REQUIREMENTS PHASE
-**Last Updated:** 2026-01-18
-**Goal:** Single entry point for all external clients to access TAXLIEN.online services
+**Version:** 1.0 (Legacy reference)
+**Status:** REQUIREMENTS
+**Last Updated:** 2026-02-04
+**Goal:** Описание legacy Python Gateway и границ ответственности.
+
+**Уточнение по прокси:** Управление прокси не входит в Gateway. Воркеры сами подключаются к tor-socks-proxy (переменные окружения). Endpoints `/internal/proxy/*` в Gateway не реализуются. См. `sdd-taxlien-gateway` (v3.0) и 02-specifications (раздел "tor-socks-proxy: NOT Gateway's Responsibility").
 
 ---
 

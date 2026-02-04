@@ -309,6 +309,10 @@ Shon Budget: $200-$2,000 per lien × 3 = $600-$6,000 total
 - [ ] Shon: 3 liens выбраны из списка
 - [ ] **Dec 21:** South Dakota deed purchased
 
+## Integration Note (Gateway / Supabase)
+
+**Endpoints для Miw (foreclosure-candidates, OTC, search, CSV export):** реализуются через **sdd-taxlien-gateway-supabase** (PostgREST, views, RPC), а не через Go Gateway. Go Gateway (sdd-taxlien-gateway v3.0) — только Worker API :8081. См. 04-integration-with-system.md.
+
 ## Next Actions
 
 ### Feb 2026:

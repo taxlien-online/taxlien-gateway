@@ -1,9 +1,17 @@
-# Specifications: API Gateway
+# Specifications: API Gateway (Legacy Python)
 
-**Version:** 1.0
+**Version:** 1.0 (Legacy reference)
 **Status:** SPECIFICATIONS
-**Last Updated:** 2026-01-18
+**Last Updated:** 2026-02-04
 **Tech Stack:** FastAPI, Redis, Firebase Admin SDK, Prometheus
+
+**Назначение:** Спека существующего/legacy Python-кода. Целевая реализация — v3.0 Minimal (Go, один порт) в `sdd-taxlien-gateway`. Прокси не в зоне Gateway — см. раздел ниже.
+
+---
+
+## tor-socks-proxy: NOT Gateway's Responsibility (актуально для v1 и v3)
+
+**Gateway не управляет прокси.** Воркеры знают `TOR_PROXY_HOST` и `TOR_PROXY_PORT` из своего окружения и подключаются к tor-socks-proxy напрямую. В спецификации и коде не должно быть proxy pool, `/internal/proxy/create`, `/internal/proxy/{port}/rotate`, `/internal/proxy/{port}/ban`. Секции 5.5 (Proxy Management) и 7.2 (Proxy Pool Service) — устаревшие; оставлены только как история решений.
 
 ---
 
