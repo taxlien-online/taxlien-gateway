@@ -9,5 +9,6 @@ scrape_configs:
 
   - job_name: 'gateway-internal'
     scrape_interval: 5s
+    metrics_path: /metrics
     static_configs:
       - targets: ['gateway:8081']

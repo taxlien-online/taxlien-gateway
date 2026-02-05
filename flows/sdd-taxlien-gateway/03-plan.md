@@ -11,29 +11,29 @@
 
 **Цель:** Один Go-сервис на порту :8081, только Internal API для воркеров. Без публичного API, без прокси, без auth/rate-limit в Gateway.
 
-### v3.0 Phase 1: Skeleton
+### v3.0 Phase 1: Skeleton ✅
 
-- [ ] **Task 1.1:** Go module, `cmd/gateway/main.go`, один HTTP server :8081
-- [ ] **Task 1.2:** Config (env: `GATEWAY_PORT`, `GATEWAY_POSTGRES_URL`, `GATEWAY_REDIS_URL`, `GATEWAY_WORKER_TOKENS`)
-- [ ] **Task 1.3:** Middleware: request_id, logging, worker auth (X-Worker-Token)
-- [ ] **Task 1.4:** `GET /health` → 200
-- **Verification:** `curl -H "X-Worker-Token: $TOKEN" http://localhost:8081/health`
+- [x] **Task 1.1:** Go module, `cmd/gateway/main.go`, один HTTP server :8081
+- [x] **Task 1.2:** Config (env: `GATEWAY_PORT`, `GATEWAY_POSTGRES_URL`, `GATEWAY_REDIS_URL`, `GATEWAY_WORKER_TOKENS`)
+- [x] **Task 1.3:** Middleware: request_id, logging, worker auth (X-Worker-Token)
+- [x] **Task 1.4:** `GET /health` → 200
+- **Verification:** `curl http://localhost:8081/health` → 200 (health exempt from auth)
 
-### v3.0 Phase 2: Internal Endpoints
+### v3.0 Phase 2: Internal Endpoints ✅
 
-- [ ] **Task 2.1:** `GET /internal/work` — чтение задач из Redis, возврат batch
-- [ ] **Task 2.2:** `POST /internal/results` — приём результатов, upsert в PostgreSQL (Supabase)
-- [ ] **Task 2.3:** `POST /internal/tasks/{id}/complete`, `POST /internal/tasks/{id}/fail` — обновление статуса в очереди
-- [ ] **Task 2.4:** `POST /internal/raw-files` — загрузка сырых файлов (локально или Supabase Storage по решению)
-- [ ] **Task 2.5:** `POST /internal/heartbeat` — обновление worker registry в Redis
-- **Verification:** Integration tests с тестовым Redis/Postgres
+- [x] **Task 2.1:** `GET /internal/work` — чтение задач из Redis, возврат batch
+- [x] **Task 2.2:** `POST /internal/results` — приём результатов, upsert в PostgreSQL (Supabase)
+- [x] **Task 2.3:** `POST /internal/tasks/{id}/complete`, `POST /internal/tasks/{id}/fail` — обновление статуса в очереди
+- [x] **Task 2.4:** `POST /internal/raw-files` — загрузка сырых файлов (локально в GATEWAY_RAW_STORAGE_PATH)
+- [x] **Task 2.5:** `POST /internal/heartbeat` — обновление worker registry в Redis
+- **Verification:** `docker compose up -d db redis` + migration + `go run ./cmd/gateway/`
 
-### v3.0 Phase 3: Observability & Deploy
+### v3.0 Phase 3: Observability & Deploy ✅
 
-- [ ] **Task 3.1:** Prometheus metrics (`/metrics`), structured logging
-- [ ] **Task 3.2:** Dockerfile (single binary), docker-compose с :8081
-- [ ] **Task 3.3:** CI (e.g. gateway-ci.yml): lint, test, build image
-- **Verification:** Dashboard/alerting при необходимости; образ собирается
+- [x] **Task 3.1:** Prometheus metrics (`/metrics`), structured logging
+- [x] **Task 3.2:** Dockerfile.gateway (single binary), docker-compose gateway-go (:8081)
+- [x] **Task 3.3:** CI (gateway-ci.yml): golangci-lint, test, build image
+- **Verification:** `curl localhost:8081/metrics`; `docker compose --profile go up gateway-go`
 
 ### v3.0 Dependencies
 

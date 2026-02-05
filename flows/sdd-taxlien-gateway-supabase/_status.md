@@ -2,11 +2,11 @@
 
 ## Current Phase
 
-REQUIREMENTS ✅ | **SPECIFICATIONS** | PLAN | IMPLEMENTATION
+REQUIREMENTS ✅ | SPECIFICATIONS ✅ | PLAN ✅ | **IMPLEMENTATION**
 
 ## Phase Status
 
-SPECIFICATIONS DRAFTED — на ревью
+IMPLEMENTATION — готов к выполнению по 03-plan.md
 
 ## Last Updated
 
@@ -19,12 +19,12 @@ SPECIFICATIONS DRAFTED — на ревью
 ## Progress
 
 - [x] Requirements drafted (01-requirements.md)
-- [ ] Requirements approved
+- [x] Requirements approved
 - [x] Specifications drafted (02-specifications.md)
-- [ ] Specifications approved
-- [ ] Plan drafted
-- [ ] Plan approved
-- [ ] Implementation started
+- [x] Specifications approved
+- [x] Plan drafted (03-plan.md)
+- [x] Plan approved
+- [x] Implementation started (04-implementation-log.md)
 - [ ] Implementation complete
 
 ## Context Notes
@@ -44,6 +44,5 @@ SPECIFICATIONS DRAFTED — на ревью
 
 ## Next Actions
 
-1. Ревью 02-specifications.md
-2. Утвердить требования и спеки
-3. Написать план (03-plan): порядок деплоя схемы, RLS, Storage, Edge Functions
+1. Выполнять задачи по 03-plan.md: Phase 1 (Task 1.1 — base tables) → 1.2 → Phase 2 → …
+2. Фиксировать прогресс и отклонения в 04-implementation-log.md
