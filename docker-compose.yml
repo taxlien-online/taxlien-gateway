@@ -1,28 +1,31 @@
-version: '3.8'
+# Parameterized for CI/CD: BIND_IP, DATA_DIR, ENV_TAG from .env
+# See .env.example and flows/sdd-taxlien-gateway-cicd/
 
 services:
-  # v3.0 Go Minimal Worker API (single port :8081)
+  # v3.0 Go Minimal Worker API (single port :8081) — default for deploy
   gateway-go:
     build:
       context: .
       dockerfile: Dockerfile.gateway
+    image: taxlien-gateway:${ENV_TAG:-latest}
     ports:
-      - "8081:8081"
+      - "${BIND_IP:-0.0.0.0}:${GATEWAY_PORT:-8081}:8081"
     environment:
       - GATEWAY_PORT=8081
       - GATEWAY_POSTGRES_URL=postgres://user:pass@db:5432/taxlien
       - GATEWAY_REDIS_URL=redis://redis:6379/0
-      - GATEWAY_WORKER_TOKENS=dev-token
+      - GATEWAY_WORKER_TOKENS=${GATEWAY_WORKER_TOKENS:-dev-token}
       - GATEWAY_RAW_STORAGE_PATH=/data/raw
     volumes:
-      - raw_storage:/data/raw
+      - ${DATA_DIR:-./data}/raw:/data/raw
     depends_on:
       - redis
       - db
+    restart: unless-stopped
     profiles:
       - go
 
-  # Legacy Python (tri-port)
+  # Legacy Python (tri-port) — local dev only, not for CI/CD deploy
   gateway:
     build: .
     ports:
@@ -55,39 +58,41 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=taxlien
     ports:
-      - "5432:5432"
+      - "${BIND_IP:-0.0.0.0}:${DB_PORT:-5432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ${DATA_DIR:-./data}/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "${BIND_IP:-0.0.0.0}:${REDIS_PORT:-6379}:6379"
     volumes:
-      - redis_data:/data
+      - ${DATA_DIR:-./data}/redis:/data
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:v2.45.0
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "${BIND_IP:-0.0.0.0}:${PROMETHEUS_PORT:-9090}:9090"
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:10.0.0
     ports:
-      - "3000:3000"
+      - "${BIND_IP:-0.0.0.0}:${GRAFANA_PORT:-3000}:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
     depends_on:
       - prometheus
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ${DATA_DIR:-./data}/grafana:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    restart: unless-stopped
 
 volumes:
-  redis_data:
-  postgres_data:
+  # Only for legacy gateway (local dev)
   raw_storage:
-  grafana_data:

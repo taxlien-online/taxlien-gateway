@@ -1,0 +1,87 @@
+# Deploy taxlien-gateway to prod/dev/stage via self-hosted runners.
+# Requires: DEPLOY_DIR set on runner; .env and data dirs in DEPLOY_DIR/{env}/
+# See flows/sdd-taxlien-gateway-cicd/ and README CI/CD section.
+
+name: Deploy
+
+on:
+  push:
+    branches: [prod, dev, stage]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options: [prod, dev, stage]
+
+jobs:
+  deploy:
+    runs-on:
+      - self-hosted
+      - ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set environment name
+        id: env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ inputs.environment }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate environment
+        run: |
+          if [ -z "${DEPLOY_DIR}" ]; then
+            echo "::error::DEPLOY_DIR is not set in runner environment"
+            exit 1
+          fi
+          ENV_NAME="${{ steps.env.outputs.name }}"
+          TARGET_DIR="${DEPLOY_DIR}/${ENV_NAME}"
+          echo "TARGET_DIR=${TARGET_DIR}" >> "$GITHUB_ENV"
+          echo "ENV_NAME=${ENV_NAME}" >> "$GITHUB_ENV"
+          if [ ! -f "${TARGET_DIR}/.env" ]; then
+            echo "::error::.env not found in ${TARGET_DIR}. Create from .env.example and configure."
+            exit 1
+          fi
+          echo "Deploying to ${TARGET_DIR}"
+
+      - name: Copy files to deploy directory
+        run: |
+          ENV_NAME="${{ steps.env.outputs.name }}"
+          TARGET_DIR="${DEPLOY_DIR}/${ENV_NAME}"
+          cp docker-compose.yml "${TARGET_DIR}/"
+          cp Dockerfile.gateway "${TARGET_DIR}/"
+          cp go.mod go.sum "${TARGET_DIR}/"
+          cp -r cmd internal pkg migrations "${TARGET_DIR}/"
+          cp -r monitoring "${TARGET_DIR}/"
+          if [ -f .env.example ]; then
+            cp .env.example "${TARGET_DIR}/"
+          fi
+
+      - name: Deploy (build and up)
+        run: |
+          cd "${TARGET_DIR}"
+          # Optional: Linux-only profile if we add e.g. cadvisor later
+          if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            PROFILE_FLAG="--profile go"
+          else
+            PROFILE_FLAG="--profile go"
+          fi
+          docker compose build
+          docker compose down
+          docker compose ${PROFILE_FLAG} up -d
+
+      - name: Health check
+        run: |
+          sleep 10
+          cd "${TARGET_DIR}"
+          docker compose ps
+          RUNNING=$(docker compose ps --services --filter "status=running" 2>/dev/null | wc -l)
+          if [ "${RUNNING}" -lt 3 ]; then
+            echo "::warning::Only ${RUNNING} services reported running; expected at least 3 (db, redis, gateway-go or gateway, prometheus, grafana)"
+          fi
